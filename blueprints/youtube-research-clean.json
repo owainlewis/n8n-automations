@@ -1,0 +1,452 @@
+{
+  "name": "\ud83e\udd16 YouTube Research Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -320
+      ],
+      "id": "41601c71-b527-4934-9e36-47aa1cf60015",
+      "name": "When clicking \u2018Test workflow\u2019"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "channelId": "={{ $json['Channel ID'] }}"
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        620,
+        -320
+      ],
+      "id": "5509655b-c624-43b8-8e72-6436861a52c1",
+      "name": "Get Channel",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "PLACEHOLDER_CREDENTIAL_ID",
+          "name": "youTubeOAuth2Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "limit": "={{ $('Configuration').item.json.VIDEO_COUNT }}",
+        "filters": {
+          "channelId": "={{ $json.id }}"
+        },
+        "options": {
+          "order": "date"
+        }
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        840,
+        -320
+      ],
+      "id": "44d7c62e-c4ff-4cc1-997b-417b07be879a",
+      "name": "Get Videos",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "PLACEHOLDER_CREDENTIAL_ID",
+          "name": "youTubeOAuth2Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "get",
+        "videoId": "={{ $json.id.videoId }}",
+        "part": [
+          "statistics"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        -320
+      ],
+      "id": "76a1780a-243f-418b-a586-717bff04879c",
+      "name": "Get Video Statistics",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "PLACEHOLDER_CREDENTIAL_ID",
+          "name": "youTubeOAuth2Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "PLACEHOLDER_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "Youtube Research Agent",
+          "cachedResultUrl": "https://airtable.com/appNiXMnZsRTkJfxX"
+        },
+        "table": {
+          "__rl": true,
+          "value": "PLACEHOLDER_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "Channels",
+          "cachedResultUrl": "https://airtable.com/appNiXMnZsRTkJfxX/tblQwPMxtufLsFb2u"
+        },
+        "filterByFormula": "{Selected} = 1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        400,
+        -320
+      ],
+      "id": "59f62bec-c9e5-404e-9fc2-38e7318277cd",
+      "name": "Get Channels",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "PLACEHOLDER_CREDENTIAL_ID",
+          "name": "airtableOAuth2Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fe5c335a-e461-4566-ba8c-2a97c50dd303",
+              "name": "VIDEO_COUNT",
+              "value": 50,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        180,
+        -320
+      ],
+      "id": "eacc0917-82b2-4daf-af89-7dffc3df6698",
+      "name": "Configuration"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8cf9133b-18bf-4b34-8a3c-864cc73f3d36",
+              "leftValue": "={{ $('Get Videos').item.json.snippet.publishedAt }}",
+              "rightValue": "={{ $now.minus(3, 'months')   }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "after"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        -320
+      ],
+      "id": "217a509f-34f1-4b91-b83e-e9d67d923ab9",
+      "name": "Last 3 Months"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "PLACEHOLDER_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "Youtube Research Agent",
+          "cachedResultUrl": "https://airtable.com/appNiXMnZsRTkJfxX"
+        },
+        "table": {
+          "__rl": true,
+          "value": "PLACEHOLDER_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "Videos",
+          "cachedResultUrl": "https://airtable.com/appNiXMnZsRTkJfxX/tblbGN7nXsU6TOiTc"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Video Title": "={{ $('Get Videos').item.json.snippet.title.replaceAll('&#39;', \"'\").replaceAll('&quot;', '\"') }}",
+            "View Count": "={{ $json.statistics.viewCount }}",
+            "Like Count": "={{ $json.statistics.likeCount }}",
+            "Comment Count": "={{ $json.statistics.commentCount }}",
+            "Video ID": "={{ $json.id }}",
+            "Channel Name": "={{ $('Get Channel').item.json.snippet.title }}",
+            "Multiplier": "={{ $json.statistics.viewCount / ($('Get Channel').item.json.statistics.viewCount / $('Get Channel').item.json.statistics.videoCount) }} "
+          },
+          "matchingColumns": [
+            "Video ID"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Video ID",
+              "displayName": "Video ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Channel Name",
+              "displayName": "Channel Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Video Title",
+              "displayName": "Video Title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "View Count",
+              "displayName": "View Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Like Count",
+              "displayName": "Like Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Comment Count",
+              "displayName": "Comment Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Multiplier",
+              "displayName": "Multiplier",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1520,
+        -320
+      ],
+      "id": "ae555b15-6e0a-4dcd-b427-6d8944c19150",
+      "name": "Add Entry",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "PLACEHOLDER_CREDENTIAL_ID",
+          "name": "airtableOAuth2Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## YouTube Research Agent",
+        "height": 480,
+        "width": 1560,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        140,
+        -500
+      ],
+      "typeVersion": 1,
+      "id": "b8d5ab47-d125-4d10-949a-cb4c8c92cdad",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -160,
+        -120
+      ],
+      "id": "c4a39c0a-368c-48ad-8127-450afbb236b1",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking \u2018Test workflow\u2019": {
+      "main": [
+        [
+          {
+            "node": "Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Channel": {
+      "main": [
+        [
+          {
+            "node": "Get Videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Videos": {
+      "main": [
+        [
+          {
+            "node": "Get Video Statistics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Video Statistics": {
+      "main": [
+        [
+          {
+            "node": "Last 3 Months",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Channels": {
+      "main": [
+        [
+          {
+            "node": "Get Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuration": {
+      "main": [
+        [
+          {
+            "node": "Get Channels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Last 3 Months": {
+      "main": [
+        [
+          {
+            "node": "Add Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {},
+  "tags": []
+}
