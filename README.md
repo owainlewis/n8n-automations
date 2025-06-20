@@ -1,12 +1,13 @@
 # N8N Automations
 
-A collection of n8n workflow blueprints for various automation tasks.
+A collection of n8n workflow blueprints for various automation tasks with business analysis and documentation tools.
 
 ## Development Setup
 
 ### Prerequisites
 - Docker and Docker Compose
-- Python 3.6+ (for blueprint sanitization)
+- Python 3.6+ (for blueprint sanitization and analysis)
+- Claude Code CLI (optional, for automated workflow analysis)
 
 ### Getting Started
 
@@ -22,7 +23,10 @@ A collection of n8n workflow blueprints for various automation tasks.
    ```
    Access n8n at http://localhost:5678
 
-3. **Stop n8n:**
+3. **Enable tunnel for OAuth/Webhooks (optional):**
+   Set `N8N_COMMAND=start --tunnel` in `.env` to enable n8n's built-in tunneling for OAuth callbacks and webhooks.
+
+4. **Stop n8n:**
    ```bash
    docker-compose down
    ```
@@ -42,6 +46,28 @@ A collection of n8n workflow blueprints for various automation tasks.
 2. Click the workflow menu (3 dots)
 3. Select "Download"
 4. Save to your project directory
+
+## Workflow Analysis
+
+### Generate Business Summaries
+Automatically generate A2D2 (AI Agent Design Document) format business summaries for any N8N workflow:
+
+```bash
+# Using Claude Code (recommended)
+claude --file .claude/analyze_n8n_workflow.claude "Analyze this workflow: blueprints/youtube-research-clean.json"
+
+# Or use the helper script for guidance
+python analyze_workflow.py blueprints/youtube-research-clean.json
+```
+
+The analysis generates comprehensive business documentation including:
+- **Business Goal**: Problem being solved and target users
+- **Workflow Steps**: Detailed process flow
+- **Integrations**: External services and APIs used
+- **Risk Assessment**: Failure modes and mitigation strategies
+- **Business Value**: Time savings, ROI estimates, and impact metrics
+
+Example output: [YouTube Research Agent A2D2](blueprints/A2D2.md)
 
 ## Sharing Workflows Safely
 
@@ -80,12 +106,16 @@ The sanitization script:
 ## Project Structure
 
 ```
-├── blueprints/              # Sanitized, shareable workflows
-├── youtube-content-research/ # Raw workflows with credentials
-├── docker-compose.yml        # Development environment
-├── sanitize_blueprint.py     # Credential removal script
-├── .env.example             # Environment template
-└── .env                     # Your actual credentials (git-ignored)
+├── blueprints/                    # Sanitized, shareable workflows
+│   ├── A2D2.md                   # A2D2 format template
+│   └── youtube-research-clean.json # Example sanitized workflow
+├── .claude/                       # Claude Code analysis prompts
+│   └── analyze_n8n_workflow.claude
+├── docker-compose.yml             # Development environment
+├── sanitize_blueprint.py          # Credential removal script
+├── analyze_workflow.py            # Workflow analysis helper
+├── .env.example                  # Environment template
+└── .env                          # Your actual credentials (git-ignored)
 ```
 
 ## Adding New Workflows
@@ -94,7 +124,8 @@ The sanitization script:
 2. **Export** the working workflow
 3. **Save** to appropriate directory (e.g., `project-name/workflow.json`)
 4. **Sanitize** before sharing: `python sanitize_blueprint.py project-name/workflow.json blueprints/project-name-clean.json`
-5. **Document** any special setup requirements
+5. **Generate business documentation**: `claude --file .claude/analyze_n8n_workflow.claude "Analyze this workflow: blueprints/project-name-clean.json"`
+6. **Document** any special setup requirements
 
 ## Security Notes
 
