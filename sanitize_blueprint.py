@@ -61,17 +61,16 @@ def sanitize_blueprint(input_file, output_file):
         with open(output_file, 'w') as f:
             json.dump(sanitized, f, indent=2)
         
-        print(f"✅ Sanitized blueprint saved to: {output_file}")
+        print(f"Sanitized blueprint saved to: {output_file}")
         
         # Show what was sanitized
         original_size = os.path.getsize(input_file)
         sanitized_size = os.path.getsize(output_file)
-        print(f"📊 Original: {original_size} bytes, Sanitized: {sanitized_size} bytes")
-        
+        print(f"Original: {original_size} bytes, Sanitized: {sanitized_size} bytes")   
         return sanitized
         
     except Exception as error:
-        print(f"❌ Error sanitizing blueprint: {error}")
+        print(f"Error sanitizing blueprint: {error}")
         sys.exit(1)
 
 def main():
@@ -85,7 +84,7 @@ def main():
     output_file = sys.argv[2] if len(sys.argv) > 2 else input_file.replace('.json', '-sanitized.json')
     
     if not os.path.exists(input_file):
-        print(f"❌ Input file not found: {input_file}")
+        print(f"Input file not found: {input_file}")
         sys.exit(1)
     
     # Ensure output directory exists
