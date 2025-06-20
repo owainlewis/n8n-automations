@@ -50,7 +50,7 @@ A collection of n8n workflow blueprints for various automation tasks with busine
 ## Workflow Analysis
 
 ### Generate Business Summaries
-Automatically generate A2D2 (AI Agent Design Document) format business summaries for any N8N workflow:
+Automatically generate A2D2 (AI Automation Design Document) format business summaries for any N8N workflow:
 
 ```bash
 # Using Claude Code (recommended)
@@ -66,8 +66,6 @@ The analysis generates comprehensive business documentation including:
 - **Integrations**: External services and APIs used
 - **Risk Assessment**: Failure modes and mitigation strategies
 - **Business Value**: Time savings, ROI estimates, and impact metrics
-
-Example output: [YouTube Research Agent A2D2](blueprints/A2D2.md)
 
 ## Sharing Workflows Safely
 
@@ -102,21 +100,6 @@ The sanitization script:
 - [ ] Review sanitized file for any remaining sensitive data
 - [ ] Share the sanitized version from `blueprints/` directory
 - [ ] Include setup instructions for credentials needed
-
-## Project Structure
-
-```
-├── blueprints/                    # Sanitized, shareable workflows
-│   ├── A2D2.md                   # A2D2 format template
-│   └── youtube-research-clean.json # Example sanitized workflow
-├── .claude/                       # Claude Code analysis prompts
-│   └── analyze_n8n_workflow.claude
-├── docker-compose.yml             # Development environment
-├── sanitize_blueprint.py          # Credential removal script
-├── analyze_workflow.py            # Workflow analysis helper
-├── .env.example                  # Environment template
-└── .env                          # Your actual credentials (git-ignored)
-```
 
 ## Adding New Workflows
 
